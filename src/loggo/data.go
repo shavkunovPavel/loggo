@@ -17,6 +17,7 @@ type LogItem struct {
 	Id        string    `bson:"_id"`
 }
 
+// Creates log item from stringItem
 func createLogItem(stringItem string, file string, format string) (li *LogItem) {
 	li = new(LogItem)
 
@@ -34,12 +35,14 @@ func createLogItem(stringItem string, file string, format string) (li *LogItem) 
 	return
 }
 
+// Set hash from field for Id
 func (li *LogItem) setId(field string) {
 	hasher := sha1.New()
 	hasher.Write([]byte(field))
 	li.Id = base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 }
 
+// Set time field
 func (li *LogItem) setTime(format string, timeString string) bool {
 	liTime, err := time.Parse(format, timeString)
 	if err != nil {
@@ -57,6 +60,7 @@ func (li *LogItem) setTimeForm(timeString string) bool {
 	return li.setTime("Jan 2, 2006 at 3:04:05pm (UTC)", timeString)
 }
 
+// Insert an log item into the mongo collection
 func (li *LogItem) insert(c *mgo.Collection) (err error) {
 	err = c.Find(bson.M{"_id": li.Id}).One(new(LogItem))
 	if err != nil && err.Error() == "not found" {

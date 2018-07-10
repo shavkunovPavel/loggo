@@ -18,6 +18,7 @@ const (
 	MNG_COL    = "logas"
 )
 
+// Read log file and put an item into the chanel
 func readLog(path string, insertChan chan *LogItem, logFormat string) {
 	inFile, _ := os.Open(path)
 	defer inFile.Close()
@@ -35,6 +36,7 @@ func readLog(path string, insertChan chan *LogItem, logFormat string) {
 	}
 }
 
+// Go routine for proccess a log file
 func worker(file string, insertChan chan *LogItem, logFormat string) {
 	f, _ := os.Open(file)
 	defer f.Close()
@@ -52,6 +54,7 @@ func worker(file string, insertChan chan *LogItem, logFormat string) {
 	}
 }
 
+// Get list of files from command line
 func getFiles() (files []string, format string) {
 	typeFlag := flag.String("t", "first_format", "log's format: first_format | second_format")
 	flag.Parse()
