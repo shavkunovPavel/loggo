@@ -1,0 +1,49 @@
+#!/bin/bash
+
+cd $(dirname "${BASH_SOURCE[0]}")
+
+declare gpath=$("pwd")
+declare project=""
+if [[ $gpath =~ (.*\/)(.*) ]]; then
+	project=${BASH_REMATCH[2]}
+fi
+export GOPATH="$gpath"
+declare bin="$gpath/bin"
+declare binka="$bin/$project"
+declare src="$gpath/src/$project"
+declare par=$1
+
+if [[ $par == i ]]; then
+	declare -a PP
+	source ./gopackages
+	declare PP_COUNT=${#PP[@]}
+	for ((i=0;i<$PP_COUNT;i++)); do
+		echo -e "[installing]\t${PP[i]}"
+		go get ${PP[i]}
+	done
+	exit 0
+fi
+
+if [[ $par == b ]]; then
+	declare err=$(go install -i $project 2>&1 >/dev/null)
+
+	if [[ ! -z $err ]]; then
+		echo "$err"
+		exit 0
+	fi
+
+	if [[ -e $binka ]]; then
+		echo "ok"
+		exit 0
+	fi
+
+	echo "$binka not found"
+	exit -1
+fi
+
+if [[ -e $binka ]]; then
+	cd $bin
+	$binka "$@"
+else
+	echo -e "$binka not found"
+fi
